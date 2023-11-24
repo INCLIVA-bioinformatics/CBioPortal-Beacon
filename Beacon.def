@@ -1,0 +1,112 @@
+Bootstrap: library
+From: ubuntu:22.04
+
+%labels
+    APPLICATION_NAME Beacon
+    AUTHOR_NAME Roxana Andreea Moldovan Moldovan
+    YEAR 2023
+
+%post
+    # Install
+    apt-get update 
+    apt -y install git
+    
+    # Clone git
+    git clone https://gitlab.bsc.es/impact-data/impd-beacon_cbioportal.git --branch RI-implementation ./RI-implementation
+    cd RI-implementation
+    apt install python3-venv -y
+    cd beacon2-ri-api/
+    
+    # Create env
+    python3 -m venv .pycBioPortalenv
+    . .pycBioPortalenv/bin/activate
+    
+    # Install requirements 
+    pip3 install \
+      wheel==0.40.0 \
+    && pip3 install --no-build-isolation \
+      Cython==0.29.36 \
+      pyyaml==5.4.1   
+    pip install -r requirements.txt
+    
+    # Edit config file  
+    cd beacon
+    mv conf.py conf_original.py
+    echo '"""Beacon Configuration."""
+from datetime import datetime
+
+#
+# Beacon general info
+#
+beacon_id = "Incliva.cbioportal.impact.beacon-test"  # ID of the Beacon
+beacon_name = "Incliva cBioPortal Beacon"  # Name of the Beacon service
+api_version = "v2.0.0"  # Version of the Beacon implementation
+uri = "http://localhost:5050/api"
+
+#
+# Beacon granularity
+#
+default_beacon_granularity = "record"
+max_beacon_granularity = "record"
+
+#
+#  Organization info
+#
+org_id = "INCLIVA"  # Id of the organization
+org_name = "INCLIVA Instituto de Investigación Sanitaria"  # Full name
+org_description = ("Unidad de bioinformática de INCLIVA")
+org_adress = ("C. de Menéndez y Pelayo, 4, 46010 Valencia")
+org_welcome_url = "https://www.incliva.es/"
+org_contact_url = "bioinfo@incliva.es"
+org_logo_url = ""
+org_info = ""' > conf.py
+    sed -n '/# Project info/,$p' conf_original.py >> conf.py
+    cd ..
+    
+    
+%environment
+    export PATH=$PATH:/RI-implementation/beacon2-ri-api/.pycBioPortalenv/bin/pip
+
+%runscript
+    #!/bin/bash
+
+    # Predefined values
+    cd /RI-implementation/beacon2-ri-api
+    cBioPortal_URL="https://www.cbioportal.org/api"
+    study_name="acc_tcga"
+    
+    # Chack arguments
+    while getopts ":b:s:" opt; do
+      case $opt in
+        b)
+          cBioPortal_URL="$OPTARG"
+          ;;
+        s)
+          study_name="$OPTARG"
+          ;;
+        \?)
+          echo "Usage: $0 [-b cbioportal_url] [-s study_name]" >&2
+          echo "by default:"
+          echo "cBioPortal_URL: $cBioPortal_URL"
+          echo "study_name: $study_name"
+          exit 1
+          ;;
+      esac
+    done
+
+    # Export env variables
+    . .pycBioPortalenv/bin/activate
+
+    export cBioPortal_URL
+    export study_name
+
+    # Example:
+    echo "cBioPortal_URL: $cBioPortal_URL"
+    echo "study_name: $study_name"
+
+    # Execution
+    python -m beacon basicConfigFile.ini
+
+%help
+    Singularity container for executing INCLIVA's cBioPortal on top Beacon RI-API.
+
