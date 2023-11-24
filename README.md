@@ -8,7 +8,7 @@ The singularity container has been created from the beacon.def.
 sudo singularity build Beacon.sif Beacon.def
 ```
 
-# Usage
+## Usage
 
 Run Beacon. In this case, the default parameters will be used (URL https://www.cbioportal.org/api & study of cBioPortal "acc_tcga"):
 
