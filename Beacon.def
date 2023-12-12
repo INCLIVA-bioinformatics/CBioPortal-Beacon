@@ -12,8 +12,8 @@ From: ubuntu:22.04
     apt -y install git
     
     # Clone git
-    git clone https://gitlab.bsc.es/impact-data/impd-beacon_cbioportal.git --branch RI-implementation ./RI-implementation
-    cd RI-implementation
+    git clone https://gitlab.bsc.es/impact-data/impd-beacon_cbioportal.git
+    cd impd-beacon_cbioportal
     apt install python3-venv -y
     cd beacon2-ri-api/
     
@@ -65,13 +65,13 @@ org_info = ""' > conf.py
     
     
 %environment
-    export PATH=$PATH:/RI-implementation/beacon2-ri-api/.pycBioPortalenv/bin/pip
+    export PATH=$PATH:/impd-beacon_cbioportal/beacon2-ri-api/.pycBioPortalenv/bin/pip
 
 %runscript
     #!/bin/bash
 
     # Predefined values
-    cd /RI-implementation/beacon2-ri-api
+    cd /impd-beacon_cbioportal/beacon2-ri-api
     cBioPortal_URL="https://www.cbioportal.org/api"
     study_name="acc_tcga"
     

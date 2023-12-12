@@ -51,7 +51,7 @@ http://localhost:5050/api/map
 http://localhost:5050/api/configuration
 ```
 
-More information about implementation and usage: https://gitlab.bsc.es/impact-data/impd-beacon_cbioportal/-/tree/RI-implementation/ 
+More information about implementation and usage: https://gitlab.bsc.es/impact-data/impd-beacon_cbioportal
 
 
 
